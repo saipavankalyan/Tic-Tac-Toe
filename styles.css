@@ -1,0 +1,147 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --yellow: #ffcc01;
+  --green: #1ab061;
+  --black: #262626;
+  --white: #d4d4d4;
+  --gray: #57534e;
+  --dark-gray: #222;
+  --blur-black: #0000007f;
+}
+
+.hidden {
+  display: none !important;
+}
+
+html,
+body {
+  font-size: 16px;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  vertical-align: center;
+  background-color: var(--black);
+}
+
+main {
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  vertical-align: center;
+}
+
+.board {
+  width: 50%;
+  height: 550px;
+  margin: 0 auto;
+  max-width: 400px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 0.7fr repeat(3, 1fr) 0.7fr;
+}
+
+.board * {
+  margin: 5px;
+  border-radius: 5px;
+  font-weight: 600;
+}
+
+.green {
+  color: var(--green);
+}
+
+.yellow {
+  color: var(--yellow);
+}
+
+.turn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  vertical-align: center;
+}
+
+.square {
+  background-color: var(--gray);
+}
+
+.square:hover {
+  cursor: pointer;
+  opacity: 90%;
+}
+
+.shadow {
+  box-shadow: 2px 2px 1px var(--black);
+}
+
+.score {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.p1 {
+  background-color: var(--green);
+}
+
+.p2 {
+  background-color: var(--yellow);
+}
+
+.tie,
+.reset,
+.new-game {
+  background-color: var(--white);
+}
+
+.big {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: var(--blur-black);
+}
+
+.modal-contents {
+  height: 150px;
+  width: 100%;
+  max-width: 300px;
+  background-color: var(--green);
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+
+  color: white;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.modal-btn {
+  padding: 12px;
+  background-color: var(--gray);
+  color: white;
+  font-weight: 600;
+  border-radius: 3px;
+  border: none;
+}
