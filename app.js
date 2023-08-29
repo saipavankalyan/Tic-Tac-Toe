@@ -1,8 +1,3 @@
-const state = {
-  occupiedSquares: [], //starts with p1
-  matchWinners: [],
-};
-
 const p1 = {
   id: 1,
   icon: "fa-x",
@@ -13,6 +8,14 @@ const p2 = {
   id: 2,
   icon: "fa-o",
   color: "yellow",
+};
+
+const state = {
+  player1OccupiedSquares: [],
+  player2OccupiedSquares: [],
+  playerinSqaures: [],
+  matchWinners: [],
+  currPlayer: p1,
 };
 
 const winningCombinations = [
@@ -27,7 +30,8 @@ const winningCombinations = [
 ];
 
 const squares = document.querySelectorAll(".square");
-const turn = document.querySelector(".turn");
+const turnP1 = document.querySelector(".turn-p1");
+const turnP2 = document.querySelector(".turn-p2");
 const p1Score = document.querySelector(".p1");
 const p2Score = document.querySelector(".p2");
 const tieScore = document.querySelector(".tie");
@@ -42,22 +46,18 @@ const otherPlayer = (player) => (player === p1 ? p2 : p1);
 
 const countElem = (arr, elem) => arr.filter((el) => el === elem).length;
 
+const countFilledSquares = (arr) => arr.filter((el) => el !== null).length;
+
 const updatePlayerTurn = function (currPlayer = p2, newPlayer = p1) {
   if (currPlayer === newPlayer) return;
 
-  //TODO: please make it display: none.
-  turn.firstElementChild.classList.remove(
-    `${currPlayer.icon}`,
-    `${currPlayer.color}`
-  );
-  turn.firstElementChild.classList.add(
-    `${newPlayer.icon}`,
-    `${newPlayer.color}`
-  );
-
-  turn.lastElementChild.innerText = `Player ${newPlayer.id}'s turn`;
-  turn.lastElementChild.classList.remove(`${currPlayer.color}`);
-  turn.lastElementChild.classList.add(`${newPlayer.color}`);
+  if (currPlayer === p1) {
+    turnP1.classList.add("hidden");
+    turnP2.classList.remove("hidden");
+  } else {
+    turnP2.classList.add("hidden");
+    turnP1.classList.remove("hidden");
+  }
 };
 
 const checkWinner = function (moves) {
@@ -69,18 +69,15 @@ const checkWinner = function (moves) {
 };
 
 const checkGameOver = function () {
-  const p1Moves = state.occupiedSquares.filter((id, index) => !(index % 2));
-  const p2Moves = state.occupiedSquares.filter((id, index) => index % 2);
-
-  if (checkWinner(p1Moves)) {
+  if (checkWinner(state.player1OccupiedSquares)) {
     state.matchWinners.push(p1);
-    return { status: true, message: "Player 1 wins!" };
-  } else if (checkWinner(p2Moves)) {
+    return { status: true, winner: p1 };
+  } else if (checkWinner(state.player2OccupiedSquares)) {
     state.matchWinners.push(p2);
-    return { status: true, message: "Player 2 wins!" };
-  } else if (state.occupiedSquares.length === 9) {
+    return { status: true, winner: p2 };
+  } else if (countFilledSquares(state.playerinSqaures) === 9) {
     state.matchWinners.push(null);
-    return { status: true, message: "It's a tie" };
+    return { status: true, winner: null };
   } else return { status: false, message: "" };
 };
 
@@ -95,11 +92,17 @@ const renderModal = function (message) {
   modal.classList.remove("hidden");
 };
 
-const hideModal = function () {
+const hideGameOverModal = function () {
   modal.classList.add("hidden");
 };
 
 const clearBoard = function () {
+  state.playerinSqaures = [];
+  state.player1OccupiedSquares = [];
+  state.player2OccupiedSquares = [];
+
+  state.currPlayer = p1;
+
   squares.forEach((square) => {
     square.classList.remove(
       "fa-solid",
@@ -127,71 +130,90 @@ const updateScoreCard = function () {
   else
     tieScore.lastElementChild.innerText = `${countElem(
       state.matchWinners,
-      p2
+      null
     )}`;
+};
+
+const clearScoreCard = function () {
+  state.matchWinners = [];
+  p1Score.lastElementChild.innerText = `0 wins`;
+  p2Score.lastElementChild.innerText = `0 wins`;
+  tieScore.lastElementChild.innerText = `0`;
 };
 
 const addHandlerClickBoard = function () {
   squares.forEach((square) => {
     square.addEventListener("click", (e) => {
-      const currPlayer = state.occupiedSquares.length % 2 === 0 ? p1 : p2;
-
       const clickedSquare = e.target;
       const squareID = +clickedSquare.id;
 
-      let isGameOver;
+      //If user clicked the square which is already filled
+      if (state.playerinSqaures[squareID - 1]) return;
 
-      if (state.occupiedSquares.includes(squareID)) return;
+      state.playerinSqaures[squareID - 1] = state.currPlayer;
 
-      state.occupiedSquares.push(squareID);
+      state.currPlayer === p1
+        ? state.player1OccupiedSquares.push(squareID)
+        : state.player2OccupiedSquares.push(squareID);
 
       clickedSquare.classList.add(
         "fa-solid",
         "big",
         "icon",
-        `${currPlayer.icon}`,
-        `${currPlayer.color}`
+        `${state.currPlayer.icon}`,
+        `${state.currPlayer.color}`
       );
 
-      const nextPlayer = otherPlayer(currPlayer);
-      updatePlayerTurn(currPlayer, nextPlayer);
+      updatePlayerTurn(state.currPlayer, otherPlayer(state.currPlayer));
 
-      if (state.occupiedSquares.length < 5) return;
+      state.currPlayer = otherPlayer(state.currPlayer);
+
+      //Game can't be over at this point
+      if (countFilledSquares(state.playerinSqaures) < 5) return;
 
       //Check if Game is over
-      isGameOver = checkGameOver();
+      let isGameOver = checkGameOver();
       if (!isGameOver.status) return;
 
-      state.occupiedSquares = [];
+      clearBoard();
 
       updateScoreCard();
-      renderModal(isGameOver.message);
+
+      const message =
+        isGameOver.winner === p1
+          ? "Player 1 Wins!"
+          : isGameOver.winner === p2
+          ? "Player 2 Wins!"
+          : "It's a Tie!";
+      renderModal(message);
     });
   });
 };
 
 const addHandlerPlayAgain = function () {
   playAgainBtn.addEventListener("click", (e) => {
-    hideModal();
+    hideGameOverModal();
 
     clearBoard();
 
-    let currWinner = state.matchWinners.at(-1);
-    if (!currWinner) currWinner = p1;
-    updatePlayerTurn(otherPlayer(currWinner), p1);
+    updatePlayerTurn();
   });
 };
 
 const addHandlerReset = function () {
   resetBtn.addEventListener("click", (e) => {
-    window.location.reload();
+    clearBoard();
+
+    updatePlayerTurn();
+
+    clearScoreCard();
   });
 };
 
 const addHandlerNewGame = function () {
   newGameBtn.addEventListener("click", (e) => {
-    state.occupiedSquares.splice(0, state.occupiedSquares.length);
-    clearBoard(squares);
+    clearBoard();
+
     updatePlayerTurn();
   });
 };

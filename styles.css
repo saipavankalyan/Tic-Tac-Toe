@@ -64,7 +64,8 @@ main {
   color: var(--yellow);
 }
 
-.turn {
+.turn-p1,
+.turn-p2 {
   display: flex;
   flex-direction: column;
   justify-content: center;
