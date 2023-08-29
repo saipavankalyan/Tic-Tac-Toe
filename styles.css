@@ -41,10 +41,10 @@ main {
 }
 
 .board {
-  width: 50%;
-  height: 550px;
+  padding: 2em;
+  width: 28em;
+  height: 42em;
   margin: 0 auto;
-  max-width: 400px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 0.7fr repeat(3, 1fr) 0.7fr;
@@ -71,11 +71,21 @@ main {
   vertical-align: center;
 }
 
+.center {
+  text-align: center;
+}
+
+.icon {
+  font-size: 1.5em;
+}
+
 .square {
   background-color: var(--gray);
 }
 
-.square:hover {
+.square:hover,
+.reset:hover,
+.new-game:hover {
   cursor: pointer;
   opacity: 90%;
 }
@@ -106,7 +116,7 @@ main {
 }
 
 .big {
-  font-size: 32px;
+  font-size: 2em;
   font-weight: 800;
 }
 
@@ -121,9 +131,9 @@ main {
 }
 
 .modal-contents {
-  height: 150px;
+  height: 6em;
   width: 100%;
-  max-width: 300px;
+  max-width: 14em;
   background-color: var(--green);
   border-radius: 10px;
 
@@ -134,7 +144,7 @@ main {
 
   color: white;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 1.5em;
 }
 
 .modal-btn {
