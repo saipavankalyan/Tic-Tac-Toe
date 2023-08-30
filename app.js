@@ -1,22 +1,33 @@
-const p1 = {
-  id: 1,
-  icon: "fa-x",
-  color: "green",
-};
-
-const p2 = {
-  id: 2,
-  icon: "fa-o",
-  color: "yellow",
-};
-
 const state = {
-  player1OccupiedSquares: [],
-  player2OccupiedSquares: [],
+  p1: {
+    id: 1,
+    icon: "fa-x",
+    color: "green",
+    occupiedSquares: [],
+  },
+  p2: {
+    id: 2,
+    icon: "fa-o",
+    color: "yellow",
+    occupiedSquares: [],
+  },
+  validMoves: {
+    1: [2, 4, 5],
+    2: [1, 3, 5],
+    3: [2, 5, 6],
+    4: [1, 5, 7],
+    5: [1, 2, 3, 4, 6, 7, 8, 9],
+    6: [3, 5, 9],
+    7: [4, 5, 8],
+    8: [5, 7, 9],
+    9: [5, 6, 8],
+  },
   playerinSqaures: [],
   matchWinners: [],
-  currPlayer: p1,
+  currentMode: null,
+  prevSquare: null,
 };
+state.currPlayer = state.p1;
 
 const winningCombinations = [
   [1, 2, 3],
@@ -29,29 +40,38 @@ const winningCombinations = [
   [3, 5, 7],
 ];
 
+//DOM elements
+const classicModeBtn = document.querySelector(".classic");
+const endlessModeBtn = document.querySelector(".endless");
+const board = document.querySelector(".board");
 const squares = document.querySelectorAll(".square");
 const turnP1 = document.querySelector(".turn-p1");
 const turnP2 = document.querySelector(".turn-p2");
 const p1Score = document.querySelector(".p1");
 const p2Score = document.querySelector(".p2");
 const tieScore = document.querySelector(".tie");
-const modal = document.querySelector(".modal");
+const gameMode = document.querySelector(".mode");
+const gameOver = document.querySelector(".game-over");
 const modalContents = document.querySelector(".modal-contents");
 const playAgainBtn = document.querySelector(".modal-btn");
 const resetBtn = document.querySelector(".reset");
 const newGameBtn = document.querySelector(".new-game");
+const toast = document.querySelector(".toast");
 
 //Methods
-const otherPlayer = (player) => (player === p1 ? p2 : p1);
+const otherPlayer = (player) => (player === state.p1 ? state.p2 : state.p1);
 
 const countElem = (arr, elem) => arr.filter((el) => el === elem).length;
 
 const countFilledSquares = (arr) => arr.filter((el) => el !== null).length;
 
-const updatePlayerTurn = function (currPlayer = p2, newPlayer = p1) {
+const updatePlayerTurn = function (
+  currPlayer = state.p2,
+  newPlayer = state.p1
+) {
   if (currPlayer === newPlayer) return;
 
-  if (currPlayer === p1) {
+  if (currPlayer === state.p1) {
     turnP1.classList.add("hidden");
     turnP2.classList.remove("hidden");
   } else {
@@ -69,12 +89,12 @@ const checkWinner = function (moves) {
 };
 
 const checkGameOver = function () {
-  if (checkWinner(state.player1OccupiedSquares)) {
-    state.matchWinners.push(p1);
-    return { status: true, winner: p1 };
-  } else if (checkWinner(state.player2OccupiedSquares)) {
-    state.matchWinners.push(p2);
-    return { status: true, winner: p2 };
+  if (checkWinner(state.p1.occupiedSquares)) {
+    state.matchWinners.push(state.p1);
+    return { status: true, winner: state.p1 };
+  } else if (checkWinner(state.p2.occupiedSquares)) {
+    state.matchWinners.push(state.p2);
+    return { status: true, winner: state.p2 };
   } else if (countFilledSquares(state.playerinSqaures) === 9) {
     state.matchWinners.push(null);
     return { status: true, winner: null };
@@ -89,43 +109,65 @@ const renderModal = function (message) {
     ? "var(--yellow)"
     : "var(--dark-gray)";
   modalContents.style.backgroundColor = bgColor;
+  showModal(gameOver);
+};
+
+const hideModal = function (modal) {
+  modal.classList.add("hidden");
+};
+
+const showModal = function (modal) {
   modal.classList.remove("hidden");
 };
 
-const hideGameOverModal = function () {
-  modal.classList.add("hidden");
+const showBoard = function () {
+  board.classList.remove("hidden");
+};
+
+const hideBoard = function () {
+  board.classList.add("hidden");
+};
+
+const showToast = function (message) {
+  toast.classList.remove("hidden");
+  toast.innerHTML = `<p>${message}</p>`;
+};
+
+const hideToast = function () {
+  toast.classList.add("hidden");
 };
 
 const clearBoard = function () {
   state.playerinSqaures = [];
-  state.player1OccupiedSquares = [];
-  state.player2OccupiedSquares = [];
-
-  state.currPlayer = p1;
+  state.p1.occupiedSquares = [];
+  state.p2.occupiedSquares = [];
+  state.currPlayer = state.p1;
+  state.prevSquare = null;
+  state.currSquare = null;
 
   squares.forEach((square) => {
     square.classList.remove(
       "fa-solid",
       "big",
       "icon",
-      p1.icon,
-      p2.icon,
-      p1.color,
-      p2.color
+      state.p1.icon,
+      state.p2.icon,
+      state.p1.color,
+      state.p2.color
     );
   });
 };
 
 const updateScoreCard = function () {
-  if (state.matchWinners.at(-1) === p1)
+  if (state.matchWinners.at(-1) === state.p1)
     p1Score.lastElementChild.innerText = `${countElem(
       state.matchWinners,
-      p1
+      state.p1
     )} wins`;
-  else if (state.matchWinners.at(-1) === p2)
+  else if (state.matchWinners.at(-1) === state.p2)
     p2Score.lastElementChild.innerText = `${countElem(
       state.matchWinners,
-      p2
+      state.p2
     )} wins`;
   else
     tieScore.lastElementChild.innerText = `${countElem(
@@ -141,20 +183,95 @@ const clearScoreCard = function () {
   tieScore.lastElementChild.innerText = `0`;
 };
 
+const validateSquareInCurrentPlayer = function (squareID) {
+  return state.currPlayer.occupiedSquares.some((el) => el === squareID);
+};
+
+const validateEmptySquare = function (squareID) {
+  return [...state.p1.occupiedSquares, ...state.p2.occupiedSquares].every(
+    (el) => el !== squareID
+  );
+};
+
+const validateMove = function (prevSquareID, currSquareID) {
+  return state.validMoves[prevSquareID].some((el) => el === currSquareID);
+};
+
+const highlightPrevSquare = function (square) {
+  square.classList.add(`highlight-${state.currPlayer.color}`);
+};
+
+const unhighlightPrevSquare = function (square) {
+  square.classList.remove(`highlight-${state.currPlayer.color}`);
+};
+
 const addHandlerClickBoard = function () {
   squares.forEach((square) => {
     square.addEventListener("click", (e) => {
       const clickedSquare = e.target;
       const squareID = +clickedSquare.id;
 
-      //If user clicked the square which is already filled
-      if (state.playerinSqaures[squareID - 1]) return;
+      hideToast();
+
+      if (
+        state.currentMode === "endless" &&
+        state.currPlayer.occupiedSquares.length > 2
+      ) {
+        //All three pieces of the player are now active on the board
+        if (!state.prevSquare) {
+          if (!validateSquareInCurrentPlayer(squareID)) {
+            showToast("You need to move one of your existing piece");
+            return;
+          }
+          state.prevSquare = squareID;
+          highlightPrevSquare(squares[squareID - 1]);
+          return;
+        } else {
+          //retreat
+          if (squareID === state.prevSquare) {
+            state.prevSquare = null;
+            unhighlightPrevSquare(squares[squareID - 1]);
+            return;
+          }
+          //check if new square is empty
+          if (!validateEmptySquare(squareID)) {
+            showToast("Move your piece to an empty square");
+            return;
+          }
+          //check if new square is traversable from previous square
+          if (!validateMove(state.prevSquare, squareID)) {
+            showToast("Invalid move ⚠️");
+            return;
+          }
+
+          state.playerinSqaures[state.prevSquare - 1] = null;
+
+          //remove previous piece
+          state.currPlayer.occupiedSquares =
+            state.currPlayer.occupiedSquares.filter(
+              (el) => el !== state.prevSquare
+            );
+
+          squares[state.prevSquare - 1].classList.remove(
+            "fa-solid",
+            "big",
+            "icon",
+            `${state.currPlayer.icon}`,
+            `${state.currPlayer.color}`
+          );
+
+          unhighlightPrevSquare(squares[state.prevSquare - 1]);
+
+          state.prevSquare = null;
+        }
+      } else {
+        //If user clicked the square which is already filled in classic mode
+        if (state.playerinSqaures[squareID - 1]) return;
+      }
 
       state.playerinSqaures[squareID - 1] = state.currPlayer;
 
-      state.currPlayer === p1
-        ? state.player1OccupiedSquares.push(squareID)
-        : state.player2OccupiedSquares.push(squareID);
+      state.currPlayer.occupiedSquares.push(squareID);
 
       clickedSquare.classList.add(
         "fa-solid",
@@ -180,9 +297,9 @@ const addHandlerClickBoard = function () {
       updateScoreCard();
 
       const message =
-        isGameOver.winner === p1
+        isGameOver.winner === state.p1
           ? "Player 1 Wins!"
-          : isGameOver.winner === p2
+          : isGameOver.winner === state.p2
           ? "Player 2 Wins!"
           : "It's a Tie!";
       renderModal(message);
@@ -190,9 +307,17 @@ const addHandlerClickBoard = function () {
   });
 };
 
+const startGame = function (mode = "classic") {
+  hideModal(gameMode);
+
+  showBoard();
+
+  state.currentMode = mode;
+};
+
 const addHandlerPlayAgain = function () {
   playAgainBtn.addEventListener("click", (e) => {
-    hideGameOverModal();
+    hideModal(gameOver);
 
     clearBoard();
 
@@ -203,10 +328,15 @@ const addHandlerPlayAgain = function () {
 const addHandlerReset = function () {
   resetBtn.addEventListener("click", (e) => {
     clearBoard();
+    state.currentMode = null;
 
     updatePlayerTurn();
 
     clearScoreCard();
+
+    hideBoard();
+
+    showModal(gameMode);
   });
 };
 
@@ -218,7 +348,17 @@ const addHandlerNewGame = function () {
   });
 };
 
+const addHandlerSelectGameMode = function () {
+  classicModeBtn.addEventListener("click", (e) => {
+    startGame("classic");
+  });
+  endlessModeBtn.addEventListener("click", (e) => {
+    startGame("endless");
+  });
+};
+
 const init = function () {
+  addHandlerSelectGameMode();
   addHandlerClickBoard();
   addHandlerPlayAgain();
   addHandlerReset();

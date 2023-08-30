@@ -12,8 +12,23 @@
     <script type="module" src="app.js"></script>
   </head>
   <body>
+    <header>
+      <h1 class="title">Tic-Tac-Toe</h1>
+    </header>
     <main>
-      <div class="board">
+      <!-- modal opens at the start -->
+      <div class="modal mode">
+        <div class="game-mode">
+          <p>Select Game Mode</p>
+          <div class="game-mode-buttons">
+            <button class="classic">Classic</button>
+            <button class="endless">Endless</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- board -->
+      <div class="board hidden">
         <!-- turn -->
         <div class="turn-p1">
           <i class="fa-solid fa-x icon green center"></i>
@@ -25,11 +40,11 @@
           <p class="yellow center">Player 2's turn</p>
         </div>
 
-        <!-- drop down menu -->
+        <!-- Reset and New Game buttons-->
         <button class="reset">Reset</button>
         <button class="new-game">New Game</button>
 
-        <!-- board -->
+        <!-- 9 squares -->
         <button id="1" class="square shadow"></button>
         <button id="2" class="square shadow"></button>
         <button id="3" class="square shadow"></button>
@@ -54,10 +69,15 @@
           <p>0 wins</p>
         </div>
       </div>
+
+      <!-- Toast to display messages -->
+      <div class="toast hidden">
+        <p>Invalid Move ⚠️</p>
+      </div>
     </main>
 
     <!-- modal opens when the game ends -->
-    <div class="modal hidden">
+    <div class="modal hidden game-over">
       <div class="modal-contents">
         <p class="modal-text">Player 1 wins!</p>
         <button class="modal-btn">Play again</button>
