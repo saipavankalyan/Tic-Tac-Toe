@@ -1,3 +1,5 @@
+import { TIMEOUT_IN_MILLISEC } from "./config.js";
+
 const state = {
   p1: {
     id: 1,
@@ -57,6 +59,7 @@ const playAgainBtn = document.querySelector(".modal-btn");
 const resetBtn = document.querySelector(".reset");
 const newGameBtn = document.querySelector(".new-game");
 const toast = document.querySelector(".toast");
+const displayMode = document.querySelector(".show-mode");
 
 //Methods
 const otherPlayer = (player) => (player === state.p1 ? state.p2 : state.p1);
@@ -129,12 +132,21 @@ const hideBoard = function () {
 };
 
 const showToast = function (message) {
-  toast.classList.remove("hidden");
   toast.innerHTML = `<p>${message}</p>`;
+  toast.classList.remove("hidden");
 };
 
 const hideToast = function () {
   toast.classList.add("hidden");
+};
+
+const showGameMode = function (gameMode) {
+  displayMode.innerText = `${gameMode} mode`;
+  displayMode.classList.remove("hidden");
+};
+
+const hideGameMode = function () {
+  displayMode.classList.add("hidden");
 };
 
 const clearBoard = function () {
@@ -221,6 +233,7 @@ const addHandlerClickBoard = function () {
         if (!state.prevSquare) {
           if (!validateSquareInCurrentPlayer(squareID)) {
             showToast("You need to move one of your existing piece");
+            setTimeout(hideToast, TIMEOUT_IN_MILLISEC);
             return;
           }
           state.prevSquare = squareID;
@@ -236,11 +249,13 @@ const addHandlerClickBoard = function () {
           //check if new square is empty
           if (!validateEmptySquare(squareID)) {
             showToast("Move your piece to an empty square");
+            setTimeout(hideToast, TIMEOUT_IN_MILLISEC);
             return;
           }
           //check if new square is traversable from previous square
           if (!validateMove(state.prevSquare, squareID)) {
             showToast("Invalid move ⚠️");
+            setTimeout(hideToast, TIMEOUT_IN_MILLISEC);
             return;
           }
 
@@ -313,6 +328,8 @@ const startGame = function (mode = "classic") {
   showBoard();
 
   state.currentMode = mode;
+
+  showGameMode(state.currentMode);
 };
 
 const addHandlerPlayAgain = function () {
@@ -335,6 +352,10 @@ const addHandlerReset = function () {
     clearScoreCard();
 
     hideBoard();
+
+    hideToast();
+
+    hideGameMode;
 
     showModal(gameMode);
   });
