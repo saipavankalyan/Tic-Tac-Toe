@@ -28,6 +28,56 @@
         </div>
       </div>
 
+      <div class="modal hidden" data-page="rules">
+        <div class="rules hidden" data-mode="classic">
+          <h2>Classic Mode Rules</h2>
+          <div class="rule-points">
+            <p>If any of your 3 pieces form a line, you win!</p>
+            <div class="divider"></div>
+            <p>
+              This mode may end in a Tie if there is no winner when the board is
+              full
+            </p>
+            <div class="divider"></div>
+            <p>You can place your piece in any of the open squares</p>
+            <div class="divider"></div>
+            <p>
+              First player has an advantage, as they get to put 5 pieces on the
+              board
+            </p>
+            <div class="divider"></div>
+          </div>
+          <button class="rules-button shadow" data-mode="classic">
+            Let's Go!
+          </button>
+        </div>
+        <div class="rules hidden" data-mode="endless">
+          <h2>Endless Mode Rules</h2>
+          <div class="rule-points">
+            <p>If all your 3 pieces form a line, you win!</p>
+            <div class="divider"></div>
+            <p>This mode doesn't have a Tie. Play until a player wins</p>
+            <div class="divider"></div>
+            <p>
+              Each player have to first place their 3 pieces on the board before
+              they can move their pieces
+            </p>
+            <div class="divider"></div>
+            <p>Players can move their respective pieces into any open square</p>
+            <div class="divider"></div>
+            <p>
+              A piece can traverse to it's direct left, right, top, bottom if
+              and to the center if they are open
+            </p>
+            <div class="divider"></div>
+            <p>The center piece can move to any of the open square</p>
+            <div class="divider"></div>
+          </div>
+          <button class="rules-button shadow" data-mode="endless">
+            Let's Go!
+          </button>
+        </div>
+      </div>
       <!-- board -->
       <div class="board hidden">
         <!-- turn -->

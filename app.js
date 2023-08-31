@@ -28,19 +28,18 @@ const state = {
   matchWinners: [],
   currentMode: null,
   prevSquare: null,
+  winningCombinations: [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+    [1, 4, 7],
+    [2, 5, 8],
+    [3, 6, 9],
+    [1, 5, 9],
+    [3, 5, 7],
+  ],
 };
 state.currPlayer = state.p1;
-
-const winningCombinations = [
-  [1, 2, 3],
-  [4, 5, 6],
-  [7, 8, 9],
-  [1, 4, 7],
-  [2, 5, 8],
-  [3, 6, 9],
-  [1, 5, 9],
-  [3, 5, 7],
-];
 
 //DOM elements
 const classicModeBtn = document.querySelector(".classic");
@@ -60,8 +59,17 @@ const resetBtn = document.querySelector(".reset");
 const newGameBtn = document.querySelector(".new-game");
 const toast = document.querySelector(".toast");
 const displayMode = document.querySelector(".show-mode");
+const rulesPage = document.querySelector(".modal[data-page='rules']");
+const rulesClassic = document.querySelector(".rules[data-mode='classic']");
+const rulesEndless = document.querySelector(".rules[data-mode='endless']");
+const rulesClassicBtn = document.querySelector(
+  ".rules-button[data-mode='classic']"
+);
+const rulesEndlessBtn = document.querySelector(
+  ".rules-button[data-mode='endless']"
+);
 
-//Methods
+// Methods
 const otherPlayer = (player) => (player === state.p1 ? state.p2 : state.p1);
 
 const countElem = (arr, elem) => arr.filter((el) => el === elem).length;
@@ -84,7 +92,7 @@ const updatePlayerTurn = function (
 };
 
 const checkWinner = function (moves) {
-  return winningCombinations.some((combination) => {
+  return state.winningCombinations.some((combination) => {
     return combination.every((ele) => {
       return moves.includes(ele);
     });
@@ -104,7 +112,7 @@ const checkGameOver = function () {
   } else return { status: false, message: "" };
 };
 
-const renderModal = function (message) {
+const renderResultModal = function (message) {
   modalContents.firstElementChild.innerText = message;
   const bgColor = message.includes("1")
     ? "var(--green)"
@@ -147,6 +155,28 @@ const showGameMode = function (gameMode) {
 
 const hideGameMode = function () {
   displayMode.classList.add("hidden");
+};
+
+const showRules = function () {
+  hideModal(gameMode);
+
+  showModal(rulesPage);
+
+  state.currentMode === "classic"
+    ? showModal(rulesClassic)
+    : showModal(rulesEndless);
+};
+
+const startGame = function () {
+  hideModal(rulesPage);
+
+  state.currentMode === "classic"
+    ? hideModal(rulesClassic)
+    : hideModal(rulesEndless);
+
+  showGameMode(state.currentMode);
+
+  showBoard();
 };
 
 const clearBoard = function () {
@@ -217,6 +247,7 @@ const unhighlightPrevSquare = function (square) {
   square.classList.remove(`highlight-${state.currPlayer.color}`);
 };
 
+// Handlers to all the buttons
 const addHandlerClickBoard = function () {
   squares.forEach((square) => {
     square.addEventListener("click", (e) => {
@@ -317,19 +348,9 @@ const addHandlerClickBoard = function () {
           : isGameOver.winner === state.p2
           ? "Player 2 Wins!"
           : "It's a Tie!";
-      renderModal(message);
+      renderResultModal(message);
     });
   });
-};
-
-const startGame = function (mode = "classic") {
-  hideModal(gameMode);
-
-  showBoard();
-
-  state.currentMode = mode;
-
-  showGameMode(state.currentMode);
 };
 
 const addHandlerPlayAgain = function () {
@@ -355,7 +376,7 @@ const addHandlerReset = function () {
 
     hideToast();
 
-    hideGameMode;
+    hideGameMode();
 
     showModal(gameMode);
   });
@@ -371,15 +392,24 @@ const addHandlerNewGame = function () {
 
 const addHandlerSelectGameMode = function () {
   classicModeBtn.addEventListener("click", (e) => {
-    startGame("classic");
+    state.currentMode = "classic";
+    showRules();
   });
   endlessModeBtn.addEventListener("click", (e) => {
-    startGame("endless");
+    state.currentMode = "endless";
+    showRules();
   });
+};
+
+const addHandlerShowRules = function () {
+  rulesClassicBtn.addEventListener("click", (e) => startGame());
+
+  rulesEndlessBtn.addEventListener("click", (e) => startGame());
 };
 
 const init = function () {
   addHandlerSelectGameMode();
+  addHandlerShowRules();
   addHandlerClickBoard();
   addHandlerPlayAgain();
   addHandlerReset();

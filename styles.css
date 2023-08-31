@@ -9,6 +9,7 @@
   --green: #1ab061;
   --black: #262626;
   --white: #d4d4d4;
+  --white-transparent: #d4d4d45f;
   --gray: #57534e;
   --light-gray: #57534e7f;
   --dark-gray: #222;
@@ -113,7 +114,8 @@ main {
 
 .square:hover,
 .reset:hover,
-.new-game:hover {
+.new-game:hover,
+.rules-button:hover {
   cursor: pointer;
   opacity: 90%;
 }
@@ -200,9 +202,69 @@ main {
   align-items: center;
   /* gap: 2em; */
 
-  color: white;
+  color: var(--white);
   font-weight: 700;
   font-size: 1.5em;
+}
+
+.rules {
+  width: 66%;
+  min-width: 20em;
+  max-width: 40em;
+  height: 60%;
+  min-height: 20em;
+  max-height: 50em;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  gap: 1em;
+  background-color: var(--dark-gray);
+}
+
+.rules[data-mode="classic"] {
+  height: 50%;
+}
+
+.rules h2 {
+  color: var(--white);
+  margin: 0.5em auto;
+  padding: 0.5em;
+}
+
+.rule-points {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-start;
+  /* gap: 0.5em; */
+
+  color: var(--white);
+  font-weight: 500;
+  font-size: 1.2em;
+  font-family: "Courier New", Courier, monospace;
+  padding: 0 0.5em;
+}
+
+.rule-points * {
+  padding: 0.5em;
+  text-align: justify;
+}
+
+.divider {
+  padding: 2px 0.5em;
+  width: 100%;
+  border-bottom: 1px solid var(--white-transparent);
+}
+
+.rules-button {
+  width: 6em;
+  font-size: 1.2em;
+  padding: 0.5em;
+  border: 1px solid var(--black);
+  border-radius: 10px;
+  margin: 0.5em auto;
 }
 
 .game-mode-buttons {
@@ -240,17 +302,29 @@ main {
 }
 
 .highlight-green {
-  border: 1px solid var(--green);
+  border: 2px solid var(--green);
 }
 
 .highlight-yellow {
-  border: 1px solid var(--yellow);
+  border: 2px solid var(--yellow);
 }
 
 @media only screen and (max-width: 500px) {
   html,
   body {
     font-size: 12px;
+  }
+
+  .rules {
+    height: 64%;
+  }
+
+  .rule-points {
+    font-size: 1em;
+  }
+
+  .rules-button {
+    font-size: 1em;
   }
 }
 
