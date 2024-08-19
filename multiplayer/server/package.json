@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "A multiplayer Tic-Tac-Toe game using websockets",
   "main": "server.js",
+  "type": "module",
   "scripts": {
+    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sai Pavan Kalyan Munaga",

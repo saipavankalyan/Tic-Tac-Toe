@@ -1,0 +1,218 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --yellow: #ffcc01;
+  --green: #1ab061;
+  --black: #262626;
+  --white: #e4e4e4;
+  --white-transparent: #d4d4d45f;
+  --gray: #57534e;
+  --light-gray: #57534e7f;
+  --dark-gray: #222;
+  --blur-black: #0000007f;
+  --red: #b33939;
+}
+
+.App {
+  text-align: center;
+  background-color: var(--black);
+  color: var(--gray);
+  height: 100vh;
+}
+
+.title {
+  color: var(--white);
+  margin: 0 auto;
+  text-align: center;
+  font-size: 3em;
+  font-weight: 800;
+  padding-top: 1em;
+}
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  background-color: var(--blur-black);
+}
+
+.modal-content {
+  width: 50%;
+  max-width: 25em;
+  height: 12em;
+  background-color: var(--black);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  color: var(--white);
+  font-weight: 700;
+  font-size: 1em;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.button {
+  padding: 0.75em;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--gray);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 1em;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.wait {
+  color: var(--white);
+  font-size: 1.5em;
+  font-weight: 700;
+  margin: 1em;
+  padding: 1em;
+  line-height: 1.5em;
+}
+
+.text-input {
+  height: 2rem;
+  padding: 0.5em;
+  margin: 0.2em;
+}
+
+.board {
+  padding: 2em;
+  width: 28em;
+  height: 42em;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 0.7fr repeat(3, 1fr) 0.7fr;
+}
+
+.board * {
+  margin: 5px;
+  border-radius: 5px;
+  font-weight: 600;
+}
+
+.turn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  font-weight: 800;
+}
+
+.square:hover,
+.reset:hover,
+.new-game:hover {
+  cursor: pointer;
+  opacity: 90%;
+}
+
+.score {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.mode {
+  color: var(--white);
+  text-align: center;
+  margin: 0 auto;
+  font-size: 1.5em;
+  padding-top: 0.5em;
+  text-transform: capitalize;
+}
+
+.tie,
+.reset,
+.new-game {
+  background-color: var(--white);
+  color: black;
+  font-weight: 800;
+  font-size: 1em;
+}
+
+.shadow {
+  box-shadow: 2px 2px 1px var(--black);
+}
+
+.big {
+  font-size: 2em;
+  font-weight: 800;
+}
+
+.bold p {
+  font-weight: 800;
+  color: black;
+}
+
+.x {
+  background-color: var(--green) !important;
+}
+
+.o {
+  background-color: var(--yellow) !important;
+}
+
+.square {
+  background-color: var(--gray);
+}
+
+.green {
+  color: var(--green);
+}
+
+.yellow {
+  color: var(--yellow);
+}
+
+.highlight-green {
+  border: 2px solid var(--green);
+}
+
+.highlight-yellow {
+  border: 2px solid var(--yellow);
+}
+
+.tile {
+  color: var(--white);
+  font-weight: 800;
+  font-size: 1.5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1em;
+}
+
+.exit-room {
+  background-color: black;
+  width: 23.5em;
+}
+
+.leave-room {
+  color: var(--red);
+  font-weight: 800;
+  font-size: 2em;
+  padding-top: 1em;
+  flex-direction: column;
+  justify-items: left;
+  line-height: 1.5em;
+}
