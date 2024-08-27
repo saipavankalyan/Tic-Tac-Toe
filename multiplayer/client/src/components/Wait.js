@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { disconnectSocket } from '../utils/socket';
+// import { disconnectSocket } from '../utils/socket';
 import { setMode, reset } from '../utils/boardSlice';
 import {
   setRoomId,
@@ -47,9 +47,9 @@ const Wait = () => {
       console.log('player left');
       timer = setTimeout(() => {
         dispatch(clearState());
-        reset();
+        dispatch(reset());
         socket.disconnect();
-        disconnectSocket();
+        // disconnectSocket();
         navigate('/');
       }, 3000);
       dispatch(setOpponentLeft(true));

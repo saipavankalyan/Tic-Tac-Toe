@@ -10,6 +10,9 @@ import {
   updateScore,
   clearScore,
   reset,
+  newGame,
+  setPrevSquare,
+  clearSquare,
 } from '../utils/boardSlice';
 import { setActive, clearState } from '../utils/onlineGameSlice';
 
@@ -74,9 +77,7 @@ const Board = () => {
       if (status === 'player') {
         dispatch(setActive(active));
       }
-      dispatch(setWinner(null));
-      dispatch(clearSquares());
-      dispatch(clearScore());
+      dispatch(reset());
       setWinningCombo([]);
     });
 
@@ -84,15 +85,34 @@ const Board = () => {
       if (status === 'player') {
         dispatch(setActive(active));
       }
-      dispatch(setWinner(null));
-      dispatch(clearSquares());
+      dispatch(newGame());
       setWinningCombo([]);
+    });
+
+    socket.on('highlight', (index) => {
+      dispatch(setPrevSquare(index));
+    });
+
+    socket.on('unhighlight', (index) => {
+      dispatch(setPrevSquare(null));
+    });
+
+    socket.on('move-existing', (prevSquare, newSquare, symbol) => {
+      dispatch(clearSquare(prevSquare));
+      dispatch(setSquare({ index: newSquare, symbol }));
+      dispatch(setPrevSquare(null));
+      if (status === 'player') {
+        dispatch(setActive(true));
+      }
     });
 
     return () => {
       socket.off('move');
       socket.off('reset-game');
       socket.off('new-game');
+      socket.off('highlight');
+      socket.off('unhighlight');
+      socket.off('move-existing');
     };
   }, []);
 
@@ -138,6 +158,7 @@ const Board = () => {
     dispatch(setWinner(null));
     dispatch(clearSquares());
     dispatch(setActive(false));
+
     setWinningCombo([]);
   };
 
@@ -199,7 +220,7 @@ const Board = () => {
             </div>
           </div>
           {viewerCount > 0 && (
-            <div className="tile">Viwer Count: {viewerCount}</div>
+            <div className="tile">Viewer Count: {viewerCount}</div>
           )}
           <div>
             <button className="button exit-room" onClick={handleExitRoomClick}>

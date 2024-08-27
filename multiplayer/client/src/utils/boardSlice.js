@@ -15,6 +15,10 @@ const boardSlice = createSlice({
       const { index, symbol } = action.payload;
       state.squares[index] = symbol;
     },
+    clearSquare: (state, action) => {
+      const index = action.payload;
+      state.squares[index] = null;
+    },
     clearSquares: (state) => {
       state.squares = Array(9).fill(null);
     },
@@ -50,16 +54,16 @@ const boardSlice = createSlice({
     reset: (state) => {
       state.squares = Array(9).fill(null);
       state.winner = null;
-      state.score = { X: 0, O: 0, tie: 0 };
       state.occupiedSquares = [];
       state.prevSquare = null;
-      state.mode = null;
+      state.score = { X: 0, O: 0, Tie: 0 };
     },
   },
 });
 
 export const {
   setSquare,
+  clearSquare,
   clearSquares,
   setWinner,
   updateScore,

@@ -93,6 +93,42 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('highlight', (index) => {
+    const user = users[socket.id];
+    if (!user) {
+      return;
+    }
+    const { roomId } = user;
+    console.log(
+      `User ${socket.id} highlighted square ${index} in room ${roomId}`
+    );
+    socket.to(roomId).emit('highlight', index);
+  });
+
+  socket.on('unhighlight', (index) => {
+    const user = users[socket.id];
+    if (!user) {
+      return;
+    }
+    const { roomId } = user;
+    console.log(
+      `User ${socket.id} unhighlighted square ${index} in room ${roomId}`
+    );
+    socket.to(roomId).emit('unhighlight', index);
+  });
+
+  socket.on('move-existing', (prevSquare, index, symbol) => {
+    const user = users[socket.id];
+    if (!user) {
+      return;
+    }
+    const { roomId } = user;
+    console.log(
+      `User ${socket.id} moved from ${prevSquare} to ${index} in room ${roomId} with symbol ${symbol}`
+    );
+    socket.to(roomId).emit('move-existing', prevSquare, index, symbol);
+  });
+
   socket.on('move', ({ index, symbol }) => {
     const user = users[socket.id];
     if (!user) {
