@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { disconnectSocket } from '../utils/socket';
@@ -15,6 +15,9 @@ import {
   clearSquare,
 } from '../utils/boardSlice';
 import { setActive, clearState } from '../utils/onlineGameSlice';
+import { toast } from 'react-toastify';
+import Confetti from 'react-confetti';
+import { CONFETTI_DURATION } from '../utils/constants';
 
 const Board = () => {
   const dispatch = useDispatch();
@@ -30,6 +33,7 @@ const Board = () => {
   const viewerCount = useSelector((state) => state.onlineGame.viewerCount);
   const opponentLeft = useSelector((state) => state.onlineGame.opponentLeft);
   const [winningCombo, setWinningCombo] = useState([]);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const winningCombos = [
     [0, 1, 2],
@@ -43,6 +47,7 @@ const Board = () => {
   ];
 
   useEffect(() => {
+    let timer;
     for (let i = 0; i < winningCombos.length; i++) {
       const [a, b, c] = winningCombos[i];
       if (
@@ -53,7 +58,20 @@ const Board = () => {
         dispatch(setWinner(squares[a]));
         dispatch(updateScore(squares[a]));
         setWinningCombo([a, b, c]);
-        socket.emit('winner', squares[a]);
+        if (squares[a] === symbol) {
+          console.log('show confetti');
+          setShowConfetti(true);
+          timer = setTimeout(() => {
+            setShowConfetti(false);
+          }, CONFETTI_DURATION);
+          socket.emit('winner', squares[a]);
+        } else {
+          if (status === 'player') {
+            toast.info('You lost the game');
+          } else {
+            toast.info(`Player ${squares[a]} won the game`);
+          }
+        }
         return;
       }
     }
@@ -63,6 +81,10 @@ const Board = () => {
       dispatch(updateScore('Tie'));
       socket.emit('winner', 'Tie');
     }
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [squares]);
 
   useEffect(() => {
@@ -79,6 +101,7 @@ const Board = () => {
       }
       dispatch(reset());
       setWinningCombo([]);
+      setShowConfetti(false);
     });
 
     socket.on('new-game', ({ active, status }) => {
@@ -87,6 +110,7 @@ const Board = () => {
       }
       dispatch(newGame());
       setWinningCombo([]);
+      setShowConfetti(false);
     });
 
     socket.on('highlight', (index) => {
@@ -114,7 +138,7 @@ const Board = () => {
       socket.off('unhighlight');
       socket.off('move-existing');
     };
-  }, []);
+  }, [dispatch, socket, status]);
 
   const getTurnClasses = () => {
     let classes = 'turn';
@@ -138,7 +162,7 @@ const Board = () => {
     return classes;
   };
 
-  const handleResetGameClick = () => {
+  const handleResetGameClick = useCallback(() => {
     if (status !== 'player') {
       return;
     }
@@ -146,11 +170,12 @@ const Board = () => {
     dispatch(clearSquares());
     dispatch(setActive(false));
     setWinningCombo([]);
+    setShowConfetti(false);
     dispatch(clearScore());
     socket.emit('reset-game');
-  };
+  }, [dispatch, socket, status]);
 
-  const handleNewGameClick = () => {
+  const handleNewGameClick = useCallback(() => {
     if (status !== 'player') {
       return;
     }
@@ -158,17 +183,28 @@ const Board = () => {
     dispatch(setWinner(null));
     dispatch(clearSquares());
     dispatch(setActive(false));
-
     setWinningCombo([]);
-  };
+    setShowConfetti(false);
+  }, [dispatch, socket, status, winner]);
 
-  const handleExitRoomClick = () => {
+  const handleExitRoomClick = useCallback(() => {
     dispatch(clearState());
     reset();
     socket.disconnect();
     disconnectSocket();
     navigate('/');
-  };
+  }, [dispatch, navigate, socket]);
+
+  const handleSquareClick = useCallback(
+    (index) => {
+      if (status === 'player' && active && !squares[index]) {
+        dispatch(setSquare({ index, symbol }));
+        dispatch(setActive(false));
+        socket.emit('move', index, symbol);
+      }
+    },
+    [dispatch, socket, status, active, squares, symbol]
+  );
 
   return (
     <div>
@@ -179,6 +215,7 @@ const Board = () => {
         </div>
       ) : (
         <>
+          {showConfetti && <Confetti />}
           <h2 className="mode">{mode} mode</h2>
           <div className="board">
             <div className={getTurnClasses()}>
@@ -204,6 +241,7 @@ const Board = () => {
                 key={index}
                 index={index}
                 isWinning={winningCombo.includes(index)}
+                onClick={handleSquareClick}
               />
             ))}
             <div className="score x bold">

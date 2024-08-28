@@ -9,7 +9,7 @@ import {
 import { setActive } from '../utils/onlineGameSlice';
 import { toast } from 'react-toastify';
 
-const Square = ({ index, isWinning }) => {
+const Square = React.memo(({ index, isWinning }) => {
   const dispatch = useDispatch();
   const socket = useSelector((state) => state.onlineGame.socket);
   const winner = useSelector((state) => state.board.winner);
@@ -119,6 +119,6 @@ const Square = ({ index, isWinning }) => {
       {value ? value : ''}
     </button>
   );
-};
+});
 
 export default Square;
