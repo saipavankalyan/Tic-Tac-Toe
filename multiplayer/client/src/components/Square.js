@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   setSquare,
@@ -7,6 +7,7 @@ import {
   clearSquare,
 } from '../utils/boardSlice';
 import { setActive } from '../utils/onlineGameSlice';
+import { toast } from 'react-toastify';
 
 const Square = ({ index, isWinning }) => {
   const dispatch = useDispatch();
@@ -34,12 +35,15 @@ const Square = ({ index, isWinning }) => {
   };
 
   const validateMove = (prevSquare, newSquare) => {
-    // console.log('validating', prevSquare, newSquare);
     return validMoves[prevSquare].some((square) => square === newSquare);
   };
 
   const handleSquareClick = () => {
+    toast.dismiss();
     if (winner !== null || status !== 'player' || !active) {
+      if (winner !== null) toast.warn('Game over');
+      else if (status !== 'player') toast.warn("You are a viewer, can't play");
+      else if (!active) toast.warn('Wait for your turn');
       return;
     }
 
@@ -47,9 +51,9 @@ const Square = ({ index, isWinning }) => {
       if (prevSquare === null) {
         // can move any of current occupied positions
         if (!occupiedSquares.includes(index)) {
+          toast.warn('You need to move one of your existing pieces');
           return;
         }
-        // console.log('highlighting', index);
         dispatch(setPrevSquare(index));
         socket.emit('highlight', index);
         return;
@@ -63,10 +67,12 @@ const Square = ({ index, isWinning }) => {
         const newSquare = squares[index];
         //new square should be empty
         if (newSquare) {
+          toast.warn('Move your piece to an empty square');
           return;
         }
         //move should be valid
         if (!validateMove(prevSquare, index)) {
+          toast.warn('Invalid move');
           return;
         }
         dispatch(clearSquare(prevSquare));
@@ -81,6 +87,10 @@ const Square = ({ index, isWinning }) => {
         dispatch(setActive(false));
       }
     } else {
+      if (squares[index] !== null) {
+        toast.warn('Square already occupied');
+        return;
+      }
       dispatch(setSquare({ index, symbol }));
       dispatch(setActive(false));
       dispatch(setOccupiedSquares([...occupiedSquares, index]));
